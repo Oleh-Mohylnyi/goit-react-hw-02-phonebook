@@ -11,6 +11,3 @@ ReactDOM.render(
   document.getElementById('root')
 );
 
-
-
-console.log('Привіт, світ! Життя химерне!');
