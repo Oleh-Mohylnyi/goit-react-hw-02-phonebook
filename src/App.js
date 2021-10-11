@@ -1,7 +1,7 @@
 // import logo from './logo.svg';
 import React from 'react';
 import { Component } from 'react';
-import s from './App.module.css';
+import './App.css';
 import Form from './components/Form'
 import List from './components/List'
 import { v4 as uuid } from 'uuid';
@@ -11,40 +11,32 @@ class App extends Component {
 
   state = {
     contacts: [
-    {id: 'id-1', name: 'Rosie Simpson', number: '459-12-56'},
-    {id: 'id-2', name: 'Hermione Kline', number: '443-89-12'},
-    {id: 'id-3', name: 'Eden Clements', number: '645-17-79'},
-    {id: 'id-4', name: 'Annie Copeland', number: '227-91-26'},
+      { id: 'id-1', name: 'Rosie Simpson', number: '459-12-56' },
+      { id: 'id-2', name: 'Hermione Kline', number: '443-89-12' },
+      { id: 'id-3', name: 'Eden Clements', number: '645-17-79' },
+      { id: 'id-4', name: 'Annie Copeland', number: '227-91-26' },
     ],
-    name: '',
-    number: '',
     filter: ''
   }
 
-  handleChange = (e) => {
-    const { name, value } = e.target
-    this.setState({ [name]: value })
+  handleFilterChange = (e) => {
+    this.setState({ filter: e.target.value })
   }
 
-  handleSubmit = (e) => {
-    e.preventDefault()
-    if (this.state.contacts.find(contact => contact.name === this.state.name)) {
-      alert(`${this.state.name} is already in contacts`)
+  onSubmit = (name, number) => {
+    if (this.state.contacts.find(contact => contact.name === name)) {
+      alert(`${name} is already in contacts`)
     } else {
-      this.saveContact(e)
-      this.resetContact()
+      this.saveContact({ name, number })
     }
   }
 
-  resetContact = () => {
-    this.setState({ name: '', number: '' })
-  }
-
-  saveContact = e => {
+  saveContact = (newContact) => {
+    const {name, number} = newContact
     const contact = {
       id: uuid(),
-      name: this.state.name,
-      number: this.state.number
+      name,
+      number
     }
     this.setState(({ contacts }) => ({
       contacts: [contact, ...contacts],
@@ -53,34 +45,33 @@ class App extends Component {
 
   deleteContact = id => {
     this.setState(prevState => ({
-      contacts: prevState.contacts.filter(todo => todo.id !== id)
+      contacts: prevState.contacts.filter(contact => contact.id !== id)
     }))
   }
 
   render() {
+
+    const filtredContacts = this.state.contacts.filter(contact => contact.name.toLowerCase().includes(this.state.filter.toLowerCase()))
+
     return (
-      <div className={s.app}>
+      <div className="app">
         <h1>Phonebook</h1>
         <Form
-          handleChange={this.handleChange}
-          handleSubmit={this.handleSubmit}
-          name={this.state.name}
-          number={this.state.number} />
+          saveForm={this.onSubmit}
+          />
         
         {this.state.contacts.length > 0 
           ? (<>
             <h2>Contacts</h2>
-              <Filter
-                  handleChange={this.handleChange}
-                  filter={this.state.filter} />
-          </>)
-                    : (<p>no contacts at the moment</p>)
-                }
+            <Filter
+                handleChange={this.handleFilterChange}
+                filter={this.state.filter} />
+            </>)
+          : (<p>no contacts at the moment</p>)
+        }
         <List
-          handleChange={this.handleChange}
+          filtredContacts={filtredContacts}
           deleteContact={this.deleteContact}
-          contacts={this.state.contacts}
-          filter={this.state.filter}
           />
       </div>
     )
