@@ -1,6 +1,7 @@
 import React, {Component} from "react"
 import ListItem from "../ListItem/ListItem"
 import s from './list.module.scss'
+import PropTypes from 'prop-types'
 
 export default class List extends Component {
     state = {
@@ -16,35 +17,47 @@ export default class List extends Component {
     }
 
     render() {
+        const {edit} = this.state
         let classNameCheckbox = 'checkboxEdit'
-        if (this.state.edit) {
+        if (edit) {
         classNameCheckbox += ' checkboxEditActive'
         }
+        const {filtredContacts, deleteContact} = this.props
 
         return (
             <div className={s.contactsList}>
-                {this.props.filtredContacts.length > 0
+                {filtredContacts.length > 0
                     ? (<label
                         className={classNameCheckbox}>
                         Edit
                         <input
                         type="checkbox"
                             className={s.hidden}
-                            checked={this.state.edit}
+                            checked={edit}
                             onChange={this.handleCheckbox}
                         />
                         </label>)
-                    : (<></>)
+                    : null
                 }    
                 <ul className={s.list}>
                     <ListItem
-                        filtredContacts={this.props.filtredContacts}
+                        filtredContacts={filtredContacts}
                         changeCheckbox={this.changeCheckbox}
-                        checboxForEdit={this.state.edit}
-                        deleteContact={this.props.deleteContact}
+                        checboxForEdit={edit}
+                        deleteContact={deleteContact}
                     />
                 </ul>
             </div>
         )
     }
 }
+
+List.defaultProps = {
+    filtredContacts: {},
+    deleteContact: () => { },
+}
+
+List.propTypes = {
+    deleteContact: PropTypes.func,
+    filtredContacts: PropTypes.array
+    }

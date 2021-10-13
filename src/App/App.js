@@ -2,10 +2,10 @@
 import React from 'react';
 import { Component } from 'react';
 import './App.css';
-import Form from './components/Form'
-import List from './components/List'
+import Form from '../components/Form'
+import List from '../components/List'
 import { v4 as uuid } from 'uuid';
-import Filter from './components/Filter';
+import Filter from '../components/Filter';
 
 class App extends Component {
 
@@ -23,11 +23,29 @@ class App extends Component {
     this.setState({ filter: e.target.value })
   }
 
+  // regNumber = /+?/d{1,4}?[-./s]?/(?/d{1,3}?/)?[-./s]?/d{1,4}[-./s]?/d{1,4}[-./s]?/d{1,9}
+
   onSubmit = (name, number) => {
-    if (this.state.contacts.find(contact => contact.name === name)) {
+    
+    const regNumber = /\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}/
+    const regName = /^[a-zA-Zа-яА-Я]+(([' -][a-zA-Zа-яА-Я ])?[a-zA-Zа-яА-Я]*)*$/
+
+    if (this.state.contacts.find(contact => contact.name.toLowerCase() === name.toLowerCase())) {
       alert(`${name} is already in contacts`)
     } else {
-      this.saveContact({ name, number })
+      if (name === '' || number === '') {
+        alert("Do not save contact without a name or number")
+      } else {
+        if (!regName.test(name)) {
+          alert("Имя может состоять только из букв, апострофа, тире и пробелов. Например Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan и т. п.")
+        } else {
+          if (!regNumber.test(number)) {
+            alert("Номер телефона должен состоять цифр и может содержать пробелы, тире, круглые скобки и может начинаться с +")
+          } else {
+            this.saveContact({ name, number })
+          }
+        }
+      }
     }
   }
 
@@ -51,7 +69,10 @@ class App extends Component {
 
   render() {
 
-    const filtredContacts = this.state.contacts.filter(contact => contact.name.toLowerCase().includes(this.state.filter.toLowerCase()))
+    const filtredContacts =
+      this.state.contacts.filter(
+        contact => contact.name.toLowerCase().includes(
+          this.state.filter.toLowerCase()))
 
     return (
       <div className="app">
